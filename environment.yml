@@ -1,0 +1,14 @@
+name: cs231n
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - matplotlib
+  - pandas
+  - ruff
+  - jupyterlab
+  - pytorch
+  - isort
+  - black
+  - scipy
+  - numpy

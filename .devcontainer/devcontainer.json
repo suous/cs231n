@@ -1,0 +1,49 @@
+{
+	"name": "cs231n",
+	"build": { 
+		"context": "..",
+		"dockerfile": "Dockerfile"
+	},
+	"hostRequirements": {
+		"cpus": 4,
+		"memory": "8gb"
+	},
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/mamba-org/devcontainer-features/micromamba:1": {
+			"channels": "conda-forge",
+			"envFile": "/tmp/environment.yml"
+		},
+		"ghcr.io/devcontainers/features/common-utils:2": {},
+		"ghcr.io/devcontainers/features/sshd:1": {}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "eval \"$(micromamba shell hook --shell zsh)\"",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			// Set *default* container specific settings.json values on container create.
+			"settings": {
+				"workbench.colorTheme": "Default Dark Modern",
+				"terminal.integrated.defaultProfile.linux": "zsh",
+				"editor.inlineSuggest.enabled": true,
+				"editor.formatOnSave": false,
+			},
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"ms-python.python",
+				"ms-toolsai.jupyter",
+				"vscodevim.vim"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
