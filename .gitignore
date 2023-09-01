@@ -162,3 +162,7 @@ cython_debug/
 .DS_Store
 .ruff_cache
 .vscode
+
+# cs231n
+cifar-10-batches-py
+*.npz

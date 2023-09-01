@@ -1,7 +1,6 @@
 from builtins import range
 from builtins import object
 import numpy as np
-from past.builtins import xrange
 
 
 class KNearestNeighbor(object):
@@ -77,7 +76,7 @@ class KNearestNeighbor(object):
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-                pass
+                dists[i, j] = np.sqrt(np.sum(np.square(X[i] - self.X_train[j])))
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -101,7 +100,7 @@ class KNearestNeighbor(object):
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            dists[i] = np.sqrt(np.sum(np.square(X[i] - self.X_train), axis=1))
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -131,7 +130,14 @@ class KNearestNeighbor(object):
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # 1. direct broadcasting (with consume more memory, and slower)
+        # (num_test, 1, num_features) - (num_train, num_features) -> (num_test, num_train, num_features)
+        # dists = np.sqrt(np.sum(np.square(np.expand_dims(X, axis=1) - self.X_train), axis=2))
+
+        # 2. matrix multiplication
+        # (x - y)^2 = x^2 + y^2 - 2xy
+        # (num_test, 1) + (num_train, ) - 2 * (num_test, num_train) -> (num_test, num_train)
+        dists = np.sqrt(np.sum(np.square(X), axis=1, keepdims=True) + np.sum(np.square(self.X_train), axis=1) - 2*X@self.X_train.T)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -164,7 +170,7 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            closest_y = self.y_train[np.argsort(dists[i])[:k]]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
@@ -176,7 +182,14 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            # y_pred[i] = max(set(closest_y), key=list(closest_y).count)
+
+            # np.bincount: Count number of occurrences of each value in array of non-negative ints.
+            # np.argmax: Returns the indices of the maximum values along an axis.
+            # example:                                                 0, 1, 2, 3, 4, 5, 6, 7
+            #   np.bincount(np.array([0, 1, 1, 3, 2, 1, 7])) -> array([1, 3, 1, 1, 0, 0, 0, 1])
+            #   np.argmax(np.bincount(np.array([0, 1, 1, 3, 2, 1, 7]))) -> 1
+            y_pred[i] = np.argmax(np.bincount(closest_y))
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 

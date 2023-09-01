@@ -1,7 +1,6 @@
 from builtins import range
 import numpy as np
 from random import shuffle
-from past.builtins import xrange
 
 
 def svm_loss_naive(W, X, y, reg):
@@ -55,7 +54,18 @@ def svm_loss_naive(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    for i in range(num_train):
+        scores = X[i].dot(W)
+        correct_class_score = scores[y[i]]
+        for j in range(num_classes):
+            if j == y[i]:
+                continue
+            margin = scores[j] - correct_class_score + 1  # note delta = 1
+            if margin > 0:
+                dW[:, j] += X[i]
+                dW[:, y[i]] -= X[i]
+
+    dW = dW / num_train + 2 * reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -78,7 +88,14 @@ def svm_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = len(X)
+    scores = X @ W                                                       # (N, C)
+    correct_scores = scores[np.arange(num_train), y]                     # (N,)
+    margins = np.maximum(0, scores - correct_scores[:, None] + 1)  # (N, C)
+    # margins of correct class are 0
+    # margins[np.arange(num_train), y] = 0
+    # loss = np.sum(margins)/num_train + reg * np.sum(W**2)
+    loss = np.sum(margins)/num_train - 1 + reg * np.sum(W**2)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -93,7 +110,9 @@ def svm_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dW = (margins > 0).astype(int)                   # (N, C)
+    dW[np.arange(num_train), y] -= dW.sum(axis=1)    # (N, C)
+    dW = X.T @ dW / num_train + 2 * reg * W          # (D, N) @ (N, C) -> (D, C)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
