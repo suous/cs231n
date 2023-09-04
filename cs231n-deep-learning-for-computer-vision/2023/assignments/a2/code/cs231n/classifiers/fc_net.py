@@ -74,7 +74,13 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        dims = [input_dim] + hidden_dims + [num_classes]
+        for layer, (d_in, d_out) in enumerate(zip(dims[:-1], dims[1:]), 1):
+            self.params[f"W{layer}"] = np.random.normal(loc=0, scale=weight_scale, size=(d_in, d_out))
+            self.params[f"b{layer}"] = np.zeros(d_out)
+            if self.normalization == "batchnorm" and layer != self.num_layers:
+                self.params[f"gamma{layer}"] = np.ones(d_out)
+                self.params[f"beta{layer}"] = np.zeros(d_out)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -148,7 +154,21 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # {affine - [batch/layer norm] - relu - [dropout]} x (L - 1) - affine - softmax
+        caches = []
+        scores = X
+        for layer in range(1, self.num_layers + 1):
+            scores, cache = affine_forward(scores, self.params[f"W{layer}"], self.params[f"b{layer}"])
+            caches.append(("affine", layer, cache))
+            if layer != self.num_layers:
+                if self.normalization == "batchnorm":
+                    scores, cache = batchnorm_forward(scores, self.params[f"gamma{layer}"], self.params[f"beta{layer}"], self.bn_params[layer-1])
+                    caches.append(("batchnorm", layer, cache))
+                scores, cache = relu_forward(scores)
+                caches.append(("relu", layer, cache))
+                if self.use_dropout:
+                    scores, cache = dropout_forward(scores, self.dropout_param)
+                    caches.append(("dropout", layer, cache))
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -175,7 +195,25 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        loss, dout = softmax_loss(scores, y)
+        # add L2 regularization for all layers
+        for layer in range(1, self.num_layers+1):
+            loss += 0.5*self.reg*np.sum(self.params[f"W{layer}"]**2)
+
+        for name, layer, cache in reversed(caches):
+            match name:
+                case "affine":
+                    dout, dw, db = affine_backward(dout, cache)
+                    grads[f"W{layer}"] = dw + self.reg*self.params[f"W{layer}"]
+                    grads[f"b{layer}"] = db
+                case "relu":
+                    dout = relu_backward(dout, cache)
+                case "dropout":
+                    dout = dropout_backward(dout, cache)
+                case "batchnorm":
+                    dout, dgamma, dbeta = batchnorm_backward_alt(dout, cache)
+                    grads[f"gamma{layer}"] = dgamma
+                    grads[f"beta{layer}"] = dbeta
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
