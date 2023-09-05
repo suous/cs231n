@@ -166,3 +166,4 @@ cython_debug/
 # cs231n
 cifar-10-batches-py
 *.npz
+im2col_cython.c
