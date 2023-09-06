@@ -1,14 +1,20 @@
 name: cs231n
 channels:
-  - conda-forge
-  - defaults
+- conda-forge
 dependencies:
-  - matplotlib
-  - pandas
-  - ruff
-  - jupyterlab
-  - pytorch
-  - isort
-  - black
-  - scipy
-  - numpy
+- black
+- black-jupyter
+- cython
+- imageio
+- isort
+- jupyterlab
+- matplotlib
+- pandas
+- python
+- pytorch
+- ruff
+- scikit-learn
+- scipy
+- tensorboard
+- torchvision
+

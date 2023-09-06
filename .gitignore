@@ -167,3 +167,4 @@ cython_debug/
 cifar-10-batches-py
 *.npz
 im2col_cython.c
+runs

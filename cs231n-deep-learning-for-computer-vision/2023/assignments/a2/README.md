@@ -1,0 +1,17 @@
+# Assignment 2: Fully Connected and Convolutional Nets, Batch Normalization, Dropout, Pytorch & Network Visualization
+
+- [Code](code)
+  - [Q1: Multi-Layer Fully Connected Neural Networks](code/FullyConnectedNets.ipynb)
+  - [Q2: Batch Normalization](code/BatchNormalization.ipynb)
+  - [Q3: Dropout](code/Dropout.ipynb)
+  - [Q4: Convolutional Neural Networks](code/ConvolutionalNetworks.ipynb)
+  - [Q5: PyTorch on CIFAR-10](code/PyTorch.ipynb)
+- [Additional Notes](additional-notes)
+  - [A1: Neural Network Basics](additional-notes/001_nn.ipynb)
+  - [A2: Gray Scale Convolution](additional-notes/002_gray_scale_convolution.ipynb)
+  - [A3: RGB Scale Convolution](additional-notes/003_rgb_scale_convolution.ipynb)
+  - [A4: Batch RGB Scale Convolution](additional-notes/004_batch_rgb_scale_convolution.ipynb)
+  - [A5: Batch RGB Scale Convolution with Padding and Pooling](additional-notes/005_batch_rgb_scale_convolution_with_padding_and_pooling.ipynb)
+  - [A6: Convolution Benchmarks](additional-notes/006_convolution_benchmarks.ipynb)
+  - [A7: Convolution Backward](additional-notes/007_convolution_backward.ipynb)
+  - [A8: Pooling Layer Details](additional-notes/008_pooling_layer_details.ipynb)

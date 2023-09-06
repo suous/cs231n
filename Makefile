@@ -8,10 +8,13 @@ check-scripts:
 
 export:
 	# remove prefix and mac specific packages for cross platform compatibility
-	conda env export --from-history | grep -v -e '^prefix: ' -e 'pyobjc' > environment.yml
+	micromamba env export --from-history | grep -v -e '^prefix: ' -e 'pyobjc' > environment.yml
 
 export-with-version:
-	conda env export --no-build | grep -v '^prefix' > environment.yml
+	micromamba env export --no-build | grep -v '^prefix' > environment.yml
+
+export-detail:
+	micromamba env export > environment-detail.yml
 
 environment:
-	conda env create -f environment.yml
+	micromamba env create -f environment-detail.yml
