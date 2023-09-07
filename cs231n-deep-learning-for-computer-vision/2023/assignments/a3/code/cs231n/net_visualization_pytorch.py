@@ -34,7 +34,11 @@ def compute_saliency_maps(X, y, model):
     ##############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    loss = model(X).gather(1, y.view(-1, 1)).sum()
+    loss.backward()
+    with torch.no_grad():
+        saliency = X.grad.abs().max(dim=1).values
+        X.grad.zero_()
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
@@ -76,7 +80,15 @@ def make_fooling_image(X, target_y, model):
     ##############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    while True:
+        preds = model(X_fooling)
+        if preds.argmax() == target_y:
+            break
+        loss = preds[0, target_y]
+        loss.backward()
+        with torch.no_grad():
+            X_fooling += learning_rate * X_fooling.grad / X_fooling.grad.norm()
+            X_fooling.grad.zero_()
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
@@ -94,7 +106,12 @@ def class_visualization_update_step(img, model, target_y, l2_reg, learning_rate)
     ########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    preds = model(img)   # (1, 1000)
+    loss = preds[0, target_y] - 0.5 * l2_reg * img.norm() ** 2
+    loss.backward()
+    with torch.no_grad():
+        img += learning_rate * (img.grad - l2_reg * img) / img.grad.norm()
+        img.grad.zero_()
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ########################################################################

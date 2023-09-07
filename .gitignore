@@ -169,3 +169,4 @@ cifar-10-batches-py
 !gan-checks.npz
 im2col_cython.c
 runs
+coco_captioning
