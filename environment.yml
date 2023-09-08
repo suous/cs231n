@@ -5,6 +5,7 @@ dependencies:
 - black
 - black-jupyter
 - cython
+- h5py
 - imageio
 - isort
 - jupyterlab

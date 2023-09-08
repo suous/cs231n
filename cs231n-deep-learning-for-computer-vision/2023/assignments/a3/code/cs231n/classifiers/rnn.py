@@ -148,7 +148,49 @@ class CaptioningRNN:
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # features:     (N, D)
+        # W_proj:       (D, H)
+        # b_proj:       (H, )
+        # W_embed:      (V, W)
+        # Wx:           (W, H)
+        # Wh:           (H, H)
+        # b:            (H, )
+        # W_vocab:      (H, V)
+        # b_vocab:      (V, )
+        # captions_in:  (N, T)
+        # captions_out: (N, T)
+
+        # 1. compute the initial hidden state from the image features.
+        # h0:           (N, H)
+        h0, cache_affine = affine_forward(features, W_proj, b_proj)
+
+        # 2. transform the words in captions_in from indices to vectors.
+        # x:            (N, T, W)
+        x, cache_embed = word_embedding_forward(captions_in, W_embed)
+
+        # 3. process the sequence of input word vectors and produce hidden state vectors for all timesteps.
+        # h:            (N, T, H)
+        h, cache_rnn = rnn_forward(x, h0, Wx, Wh, b)
+
+        # 4. compute scores over the vocabulary at every timestep using the hidden states.
+        # scores:       (N, T, V)
+        scores, cache_temporal_affine = temporal_affine_forward(h, W_vocab, b_vocab)
+
+        # 5. compute loss using captions_out and mask.
+        # loss:         scalar
+        loss, dout = temporal_softmax_loss(scores, captions_out, mask)
+
+        # 5.1. compute gradients of loss with respect to scores.
+        dout, grads["W_vocab"], grads["b_vocab"] = temporal_affine_backward(dout, cache_temporal_affine)
+
+        # 5.2. compute gradients of loss with respect to hidden states.
+        dout, dh0, grads["Wx"], grads["Wh"], grads["b"] = rnn_backward(dout, cache_rnn)
+
+        # 5.3. compute gradients of loss with respect to word vectors.
+        grads["W_embed"] = word_embedding_backward(dout, cache_embed)
+
+        # 5.4. compute gradients of loss with respect to image features.
+        _, grads["W_proj"], grads["b_proj"] = affine_backward(dh0, cache_affine)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -216,7 +258,26 @@ class CaptioningRNN:
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # features:     (N, D)
+        # W_proj:       (D, H)
+        # b_proj:       (H, )
+        # W_embed:      (V, W)
+        # Wx:           (W, H)
+        # Wh:           (H, H)
+        # b:            (H, )
+        # W_vocab:      (H, V)
+        # b_vocab:      (V, )
+        # captions:     (N, M)
+
+        h_out, _ = affine_forward(features, W_proj, b_proj)         # (N, H)
+        h_prev = self._start * np.ones(N, dtype=np.int32)           # (N,  )
+
+        for i in range(max_length):
+            h_embed, _ = word_embedding_forward(h_prev, W_embed)    # (N, W)
+            h_out, _ = rnn_step_forward(h_embed, h_out, Wx, Wh, b)  # (N, H)
+            scores, _ = affine_forward(h_out, W_vocab, b_vocab)     # (N, V)
+            h_prev = np.argmax(scores, axis=1)                      # (N,  )
+            captions[:, i] = h_prev
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
