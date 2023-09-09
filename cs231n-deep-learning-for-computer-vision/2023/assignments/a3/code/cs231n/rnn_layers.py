@@ -322,13 +322,13 @@ def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     _, H = prev_h.shape
-    z = x @ Wx + prev_h @ Wh + b    # (N, 4H)
-    t = sigmoid(z[:,:-H])           # (N, 3H)
+    z = x @ Wx + prev_h @ Wh + b     # (N, 4H)
+    t = sigmoid(z[:,:-H])            # (N, 3H)
     i, f, o = np.split(t, 3, axis=1) # (N, H), (N, H), (N, H)
-    g = np.tanh(z[:,-H:])           # (N, H)
-    next_c = f * prev_c + i * g     # (N, H)
-    tz = np.tanh(next_c)            # (N, H)
-    next_h = o * tz                 # (N, H)
+    g = np.tanh(z[:,-H:])            # (N, H)
+    next_c = f * prev_c + i * g      # (N, H)
+    tz = np.tanh(next_c)             # (N, H)
+    next_h = o * tz                  # (N, H)
 
     cache = (x, prev_h, prev_c, Wx, Wh, i, f, o, g, tz)
 
@@ -384,7 +384,6 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
     dWx = x.T @ dz                        # (D, N) @ (N, 4H) = (D, 4H)
     dWh = prev_h.T @ dz                   # (H, N) @ (N, 4H) = (H, 4H)
     db = dz.sum(axis=0)                   # (4H,)
-
     dprev_h = dz @ Wh.T                   # (N, 4H) @ (4H, H) = (N, H)
     dprev_c = dc * f                      # (N, H) * (N, H) = (N, H)
 
