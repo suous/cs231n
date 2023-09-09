@@ -321,6 +321,8 @@ def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+    # https://github.com/suous/cs231n/blob/main/cs231n-deep-learning-for-computer-vision/2023/assignments/a3/additional-notes/notes/lstm.pdf
+
     _, H = prev_h.shape
     z = x @ Wx + prev_h @ Wh + b     # (N, 4H)
     t = sigmoid(z[:,:-H])            # (N, 3H)
@@ -365,6 +367,7 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+    # https://github.com/suous/cs231n/blob/main/cs231n-deep-learning-for-computer-vision/2023/assignments/a3/additional-notes/notes/lstm.pdf
     def sigmoid_derivative(x):
         return x * (1 - x)
 
