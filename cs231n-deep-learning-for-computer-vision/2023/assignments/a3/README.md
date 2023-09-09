@@ -7,3 +7,5 @@
   - [Q4: Generative Adversarial Networks](code/Generative_Adversarial_Networks.ipynb)
   - [Q5: Self-Supervised Learning for Image Classification](code/Self_Supervised_Learning.ipynb)
   - [Extra Credit: Image Captioning with LSTMs](code/LSTM_Captioning.ipynb)
+- [Additional Notes](additional-notes)
+  - [A1: Positional Encoding](additional-notes/001_positional_encoding.ipynb)

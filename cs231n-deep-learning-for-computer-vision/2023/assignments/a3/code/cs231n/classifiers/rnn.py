@@ -170,7 +170,7 @@ class CaptioningRNN:
 
         # 3. process the sequence of input word vectors and produce hidden state vectors for all timesteps.
         # h:            (N, T, H)
-        h, cache_rnn = rnn_forward(x, h0, Wx, Wh, b)
+        h, cache_rnn = {"lstm": lstm_forward, "rnn": rnn_forward}[self.cell_type](x, h0, Wx, Wh, b)
 
         # 4. compute scores over the vocabulary at every timestep using the hidden states.
         # scores:       (N, T, V)
@@ -184,7 +184,7 @@ class CaptioningRNN:
         dout, grads["W_vocab"], grads["b_vocab"] = temporal_affine_backward(dout, cache_temporal_affine)
 
         # 5.2. compute gradients of loss with respect to hidden states.
-        dout, dh0, grads["Wx"], grads["Wh"], grads["b"] = rnn_backward(dout, cache_rnn)
+        dout, dh0, grads["Wx"], grads["Wh"], grads["b"] = {"lstm": lstm_backward, "rnn": rnn_backward}[self.cell_type](dout, cache_rnn)
 
         # 5.3. compute gradients of loss with respect to word vectors.
         grads["W_embed"] = word_embedding_backward(dout, cache_embed)
@@ -271,10 +271,14 @@ class CaptioningRNN:
 
         h_out, _ = affine_forward(features, W_proj, b_proj)         # (N, H)
         h_prev = self._start * np.ones(N, dtype=np.int32)           # (N,  )
+        c_prev = np.zeros_like(h_out)                               # (N, H)
 
         for i in range(max_length):
             h_embed, _ = word_embedding_forward(h_prev, W_embed)    # (N, W)
-            h_out, _ = rnn_step_forward(h_embed, h_out, Wx, Wh, b)  # (N, H)
+            if self.cell_type == "lstm":
+                h_out, c_prev, _ = lstm_step_forward(h_embed, h_out, c_prev, Wx, Wh, b)
+            else:
+                h_out, _ = rnn_step_forward(h_embed, h_out, Wx, Wh, b)  # (N, H)
             scores, _ = affine_forward(h_out, W_vocab, b_vocab)     # (N, V)
             h_prev = np.argmax(scores, axis=1)                      # (N,  )
             captions[:, i] = h_prev
