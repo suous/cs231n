@@ -9,3 +9,4 @@
   - [Extra Credit: Image Captioning with LSTMs](code/LSTM_Captioning.ipynb)
 - [Additional Notes](additional-notes)
   - [A1: Positional Encoding](additional-notes/001_positional_encoding.ipynb)
+  - [A2: Attention](additional-notes/002_attention.ipynb)

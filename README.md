@@ -42,3 +42,4 @@
     - [Extra Credit: Image Captioning with LSTMs](cs231n-deep-learning-for-computer-vision/2023/assignments/a3/code/LSTM_Captioning.ipynb)
   - [Additional Notes](cs231n-deep-learning-for-computer-vision/2023/assignments/a3/additional-notes)
     - [A1: Positional Encoding](cs231n-deep-learning-for-computer-vision/2023/assignments/a3/additional-notes/001_positional_encoding.ipynb)
+    - [A2: Attention](cs231n-deep-learning-for-computer-vision/2023/assignments/a3/additional-notes/002_attention.ipynb)
