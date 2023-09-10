@@ -30,6 +30,9 @@ def compute_train_transform(seed=123456):
         ##############################################################################
         #                               END OF YOUR CODE                             #
         ##############################################################################
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomApply([color_jitter], p=0.8),
+        transforms.RandomGrayscale(p=0.2),
         transforms.ToTensor(),
         transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010])])
     return train_transform
@@ -57,6 +60,10 @@ class CIFAR10Pair(CIFAR10):
             #                                                                            #
             # Apply self.transform to the image to produce x_i and x_j in the paper #
             ##############################################################################
+
+            x_i = self.transform(img)
+            x_j = self.transform(img)
+
             ##############################################################################
             #                               END OF YOUR CODE                             #
             ##############################################################################

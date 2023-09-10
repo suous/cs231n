@@ -10,3 +10,4 @@
 - [Additional Notes](additional-notes)
   - [A1: Positional Encoding](additional-notes/001_positional_encoding.ipynb)
   - [A2: Attention](additional-notes/002_attention.ipynb)
+  - [A3: SimCLR](additional-notes/003_simclr.ipynb)

@@ -4,6 +4,7 @@ import random
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 
 
 def seed_everything(seed: int = 21):
@@ -19,6 +20,12 @@ def seed_everything(seed: int = 21):
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
+
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
 
 
 def value_to_rgba(value, cmap=mpl.cm.gray_r, vmin=0, vmax=1):
@@ -50,7 +57,7 @@ def value_to_rgba(value, cmap=mpl.cm.gray_r, vmin=0, vmax=1):
     return rgba
 
 
-# ruff: noqa: PLR0913
+# ruff: noqa: PLR0913, PLR0912, E501, PLR2004
 def batch_plot(
     xs,
     ys=None,
@@ -62,6 +69,8 @@ def batch_plot(
     wspace=0.1,
     hspace=0.1,
     save_path=None,
+    cols=None,
+    rows=None,
     **kwargs,
 ):
     """
@@ -89,6 +98,10 @@ def batch_plot(
         The amount of vertical space (in inches) between subplots.
     save_path : str, optional
         The path to save the figure to. If not provided, the figure will not be saved.
+    cols : int, optional
+        The number of columns to use in the grid layout. If not provided, the number of columns will be calculated automatically.
+    rows : int, optional
+        The number of rows to use in the grid layout. If not provided, the number of rows will be calculated automatically.
     **kwargs : additional keyword arguments
         Additional keyword arguments to pass to Matplotlib's `imshow` function when plotting images.
 
@@ -97,18 +110,19 @@ def batch_plot(
     None
     """
 
-    # Calculate the number of rows and columns needed to lay out the images or color swatches in a grid
-    rows = cols = int(np.ceil(np.sqrt(len(xs))))
-    # Flatten the layout into a single row if specified
-    if flatten_layout is True:
-        if flatten_columns is True:
-            rows = rows * cols
-            cols = 1
-        else:
-            cols = rows * cols
+    if rows is None and cols is None:
+        # Calculate the number of rows and columns needed to lay out the images or color swatches in a grid
+        rows = cols = int(np.ceil(np.sqrt(len(xs))))
+        # Flatten the layout into a single row if specified
+        if flatten_layout is True:
+            if flatten_columns is True:
+                rows = rows * cols
+                cols = 1
+            else:
+                cols = rows * cols
+                rows = 1
+        if rows * cols > len(xs):
             rows = 1
-    if rows * cols > len(xs):
-        rows = 1
     # Set default labels to None if not provided
     if ys is None:
         ys = np.full(len(xs), None)
@@ -122,7 +136,6 @@ def batch_plot(
 
     # Plot the images or color swatches
     for x, y, ax in zip(xs, ys, axs.flatten()):
-        # ruff: noqa: PLR2004
         if x.ndim >= 2:
             # Plot images if the dimension of the x is larger than 1
             ax.imshow(x, **kwargs)
@@ -134,7 +147,6 @@ def batch_plot(
             ax.set_title(y)
     # Hide the x- and y-axes and borders of the subplots
     for ax in axs.flatten():
-        # ruff: noqa: PLR2004
         if with_border is False and x.ndim >= 2:
             ax.axis("off")
             continue

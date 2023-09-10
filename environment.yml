@@ -18,4 +18,5 @@ dependencies:
 - scipy
 - tensorboard
 - torchvision
+- tqdm
 
