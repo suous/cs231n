@@ -30,7 +30,7 @@ def sample_noise(batch_size, dim, seed=None):
 
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    return 2 * torch.rand(batch_size, dim) - 1
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -51,7 +51,14 @@ def discriminator(seed=None):
     ##############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    model = nn.Sequential(
+        Flatten(),
+        nn.Linear(in_features=784, out_features=256),
+        nn.LeakyReLU(negative_slope=0.01),
+        nn.Linear(in_features=256, out_features=256),
+        nn.LeakyReLU(negative_slope=0.01),
+        nn.Linear(in_features=256, out_features=1)
+    )
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
@@ -76,7 +83,14 @@ def generator(noise_dim=NOISE_DIM, seed=None):
     ##############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    model = nn.Sequential(
+        nn.Linear(in_features=noise_dim, out_features=1024),
+        nn.ReLU(),
+        nn.Linear(in_features=1024, out_features=1024),
+        nn.ReLU(),
+        nn.Linear(in_features=1024, out_features=784),
+        nn.Tanh()
+    )
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
@@ -112,7 +126,9 @@ def discriminator_loss(logits_real, logits_fake):
     loss = None
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    loss_real =  bce_loss(logits_real, torch.ones_like(logits_real).squeeze())
+    loss_fake = bce_loss(logits_fake, torch.zeros_like(logits_fake).squeeze())
+    loss = loss_real + loss_fake
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     return loss
@@ -130,7 +146,7 @@ def generator_loss(logits_fake):
     loss = None
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    loss = bce_loss(logits_fake, torch.ones_like(logits_fake).squeeze())
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     return loss
@@ -149,7 +165,7 @@ def get_optimizer(model):
     optimizer = None
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    optimizer = optim.Adam(model.parameters(), lr=1e-3, betas=(0.5, 0.999))
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     return optimizer
