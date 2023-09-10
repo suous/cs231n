@@ -132,6 +132,10 @@ def compute_sim_matrix(out):
     out = out / torch.linalg.norm(out, dim=1, keepdims=True)  # (2N, D)
     sim_matrix = out @ out.T                                  # (2N, 2N)
 
+    # https://github.com/suous/cs231n/blob/main/cs231n-deep-learning-for-computer-vision/2023/assignments/a3/additional-notes/notes/compute_sim_matrix.pdf
+    # norm = torch.linalg.norm(out, dim=1, keepdims=True)     # (2N, 1)
+    # sim_matrix = (out @ out.T) / (norm @ norm.T)            # (2N, 2N)
+
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     
     ##############################################################################
