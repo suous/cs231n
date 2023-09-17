@@ -33,6 +33,7 @@
     - [A7: Convolution Backward](cs231n-deep-learning-for-computer-vision/2023/assignments/a2/additional-notes/007_convolution_backward.ipynb)
     - [A8: Pooling Layer Details](cs231n-deep-learning-for-computer-vision/2023/assignments/a2/additional-notes/008_pooling_layer_details.ipynb)
     - [A9: Generate Patches](cs231n-deep-learning-for-computer-vision/2023/assignments/a2/additional-notes/009_generate_patches.ipynb)
+    - [A10: MLP-Mixer](cs231n-deep-learning-for-computer-vision/2023/assignments/a2/additional-notes/010_mlp_mixer.ipynb)
 - [Assignment3: Generative and Interactive Visual Intelligence](cs231n-deep-learning-for-computer-vision/2023/assignments/a3)
   - [Code](cs231n-deep-learning-for-computer-vision/2023/assignments/a3/code)
     - [Q1: Network Visualization: Saliency Maps, Class Visualization, and Fooling Images](cs231n-deep-learning-for-computer-vision/2023/assignments/a3/code/Network_Visualization.ipynb)
