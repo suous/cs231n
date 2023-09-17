@@ -15,3 +15,4 @@
   - [A6: Convolution Benchmarks](additional-notes/006_convolution_benchmarks.ipynb)
   - [A7: Convolution Backward](additional-notes/007_convolution_backward.ipynb)
   - [A8: Pooling Layer Details](additional-notes/008_pooling_layer_details.ipynb)
+  - [A9: Generate Patches](additional-notes/009_generate_patches.ipynb)
