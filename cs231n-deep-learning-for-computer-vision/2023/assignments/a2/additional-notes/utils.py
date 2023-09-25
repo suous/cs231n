@@ -1,3 +1,4 @@
+import datetime
 import os
 import random
 from pathlib import Path
@@ -5,6 +6,9 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
+import torch.nn.functional as F
+from torch.utils.tensorboard import SummaryWriter
 
 
 def seed_everything(seed: int = 21):
@@ -20,6 +24,104 @@ def seed_everything(seed: int = 21):
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+
+def check_accuracy_part_challenge(loader, model, device):
+    num_correct = 0
+    num_samples = 0
+    model.eval()
+    with torch.no_grad():
+        for x, y in loader:
+            x = x.to(device=device, dtype=torch.float32)
+            y = y.to(device=device, dtype=torch.long)
+            scores = model(x)
+            _, preds = scores.max(1)
+            num_correct += (preds == y).sum()
+            num_samples += preds.size(0)
+        acc = float(num_correct) / num_samples * 100
+    return acc
+
+
+# ruff: noqa: E501
+def train_part_challenge(
+    model, optimizer, device, log_dir, train_loader, valid_loader, scheduler=None, epochs=1, print_every=100
+):
+    check_point_dir = Path(log_dir).joinpath(datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+    check_point_dir.mkdir(exist_ok=True, parents=True)
+    check_point_name = check_point_dir / "best_model.pth"
+    writer = SummaryWriter(str(check_point_dir))
+
+    model = model.to(device=device)
+    running_loss = 0.0
+    best_valid_acc = 0.0
+    for e in range(epochs):
+        if scheduler is not None:
+            writer.add_scalar("Params/lr", scheduler.get_last_lr()[0], e)
+        for t, (x, y) in enumerate(train_loader):
+            model.train()
+            x = x.to(device=device, dtype=torch.float32)
+            y = y.to(device=device, dtype=torch.long)
+
+            scores = model(x)
+            loss = F.cross_entropy(scores, y, label_smoothing=0.1)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+            if (t + 1) % print_every == 0:
+                train_acc = check_accuracy_part_challenge(train_loader, model, device=device)
+                valid_acc = check_accuracy_part_challenge(valid_loader, model, device=device)
+                print(
+                    f"Epoch {e+1}/{epochs}, Iteration {100*(t+1)/len(train_loader):.2f}%, Loss: {loss.item():.4f}, Val accuracy: {valid_acc:.2f}"
+                )
+                writer.add_scalar("Loss/train", running_loss / print_every, e * len(train_loader) + t)
+                writer.add_scalar("Accuracy/train", train_acc, e * len(train_loader) + t)
+                writer.add_scalar("Accuracy/valid", valid_acc, e * len(train_loader) + t)
+                running_loss = 0.0
+                if valid_acc > best_valid_acc and (train_acc - valid_acc <= 6):
+                    print(f"Saving best model for epoch: {e+1}")
+                    torch.save(
+                        {
+                            "epoch": e + 1,
+                            "model_state_dict": model.state_dict(),
+                            "optimizer_state_dict": optimizer.state_dict(),
+                            "train_accuracy": train_acc,
+                            "valid_accuracy": valid_acc,
+                        },
+                        check_point_name,
+                    )
+                    best_valid_acc = valid_acc
+        if scheduler is not None:
+            scheduler.step()
+    return check_point_name
+
+
+# ruff: noqa: PLW2901
+def check_accuracy_part34(loader, model, device):
+    if loader.dataset.train:
+        print("Checking accuracy on validation set")
+    else:
+        print("Checking accuracy on test set")
+    num_correct = 0
+    num_samples = 0
+    model.eval()  # set model to evaluation mode
+    with torch.no_grad():
+        for x, y in loader:
+            x = x.to(device=device, dtype=torch.float32)  # move to device, e.g. GPU
+            y = y.to(device=device, dtype=torch.long)
+            scores = model(x)
+            _, preds = scores.max(1)
+            num_correct += (preds == y).sum()
+            num_samples += preds.size(0)
+        acc = float(num_correct) / num_samples
+        print("Got %d / %d correct (%.2f)" % (num_correct, num_samples, 100 * acc))
 
 
 def moving_average(x, win=10):

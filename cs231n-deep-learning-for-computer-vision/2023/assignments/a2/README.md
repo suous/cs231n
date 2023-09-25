@@ -17,3 +17,4 @@
   - [A8: Pooling Layer Details](additional-notes/008_pooling_layer_details.ipynb)
   - [A9: Generate Patches](additional-notes/009_generate_patches.ipynb)
   - [A10: MLP-Mixer](additional-notes/010_mlp_mixer.ipynb)
+  - [A11: MetaFormer](additional-notes/011_meta_former.ipynb)
